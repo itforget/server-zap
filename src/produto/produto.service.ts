@@ -33,6 +33,7 @@ export class ProdutoService {
         new ListaProdutoDTO(
           produto.id,
           produto.nome,
+          produto.valor,
           produto.caracteristicas,
           produto.imagens,
         ),
