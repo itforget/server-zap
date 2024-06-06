@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -25,7 +26,7 @@ export class PedidoService {
     private readonly produtoRepository: Repository<ProdutoEntity>,
   ) {}
 
-  private async buscaUsuario(id) {
+  private async buscaUsuario(id: string) {
     const usuario = await this.usuarioRepository.findOneBy({ id });
 
     if (usuario === null) {
@@ -103,6 +104,8 @@ export class PedidoService {
   }
 
   async obtemPedidosDeUsuario(usuarioId: string) {
+    await this.buscaUsuario(usuarioId);
+
     return this.pedidoRepository.find({
       where: {
         usuario: { id: usuarioId },
@@ -113,17 +116,23 @@ export class PedidoService {
     });
   }
 
-  async atualizaPedido(id: string, dto: AtualizaPedidoDto) {
-    const pedido = await this.pedidoRepository.findOneBy({ id });
+  async atualizaPedido(id: string, dto: AtualizaPedidoDto, usuarioId: string) {
+    const pedido = await this.pedidoRepository.findOne({
+      where: { id },
+      relations: { usuario: true },
+    });
+    if (pedido === null) {
+      throw new NotFoundException('O pedido não foi encontrado.');
+    }
 
-    throw new Error('Simulando erro de banco de dados...');
+    if (pedido.usuario.id !== usuarioId) {
+      throw new ForbiddenException(
+        'Você não tem autorização para atualizar esse pedido',
+      );
+    }
 
-    // if (pedido === null) {
-    //   throw new NotFoundException('O pedido não foi encontrado.');
-    // }
+    Object.assign(pedido, dto as PedidoEntity);
 
-    // Object.assign(pedido, dto);
-
-    // return this.pedidoRepository.save(pedido);
+    return this.pedidoRepository.save(pedido);
   }
 }

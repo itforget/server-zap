@@ -1,3 +1,4 @@
+import { HashearSenhaPipe } from './../recursos/pipes/hashear-senha-pipe';
 import {
   Body,
   Controller,
@@ -17,9 +18,15 @@ export class UsuarioController {
   constructor(private usuarioService: UsuarioService) {}
 
   @Post()
-  async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
-    const usuarioCriado = await this.usuarioService.criaUsuario(dadosDoUsuario);
-
+  async criaUsuario(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Body() { senha, ...dadosDoUsuario }: CriaUsuarioDTO,
+    @Body('senha', HashearSenhaPipe) senhaHasheada: string,
+  ) {
+    const usuarioCriado = await this.usuarioService.criaUsuario({
+      ...dadosDoUsuario,
+      senha: senhaHasheada,
+    });
     return {
       usuario: new ListaUsuarioDTO(usuarioCriado.id, usuarioCriado.nome),
       messagem: 'usuário criado com sucesso',
