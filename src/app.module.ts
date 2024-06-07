@@ -16,7 +16,6 @@ import { FiltroDeExcecaoGlobal } from './recursos/filtros/filtro-de-excecao-glob
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { AutenticacaoModule } from './modulos/autenticacao/autenticacao.module';
-
 @Module({
   imports: [
     UsuarioModule,

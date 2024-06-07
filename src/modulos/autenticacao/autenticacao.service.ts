@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 export interface UsuarioPayload {
   sub: string;
   nomeUsuario: string;
+  email: string;
 }
 
 @Injectable()
@@ -30,10 +31,21 @@ export class AutenticacaoService {
     const payload: UsuarioPayload = {
       sub: usuario.id,
       nomeUsuario: usuario.nome,
+      email: usuario.email,
     };
 
     return {
       token_acesso: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async validateAccessToken(accessToken: string) {
+    return await this.jwtService.verify(accessToken, {
+      secret: process.env.SEGREDO_JWT || undefined,
+    });
+  }
+
+  async decodeToken(accessToken) {
+    return await this.jwtService.decode(accessToken);
   }
 }
