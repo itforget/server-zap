@@ -38,14 +38,4 @@ export class AutenticacaoService {
       token_acesso: await this.jwtService.signAsync(payload),
     };
   }
-
-  async validateAccessToken(accessToken: string) {
-    return await this.jwtService.verify(accessToken, {
-      secret: process.env.SEGREDO_JWT || undefined,
-    });
-  }
-
-  async decodeToken(accessToken) {
-    return await this.jwtService.decode(accessToken);
-  }
 }

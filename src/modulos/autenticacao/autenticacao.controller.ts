@@ -1,15 +1,8 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Headers,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { AutenticacaoGuard } from '../autenticacao.guard';
 import { AutenticacaoService } from './autenticacao.service';
 import { AutenticaDTO } from './dto/autentica.dto';
-import { AutenticacaoGuard, RequisicaoComUsuario } from '../autenticacao.guard';
+import { RequisicaoComUsuario } from '../autenticacao.guard';
 
 @Controller('autenticacao')
 export class AutenticacaoController {
@@ -21,14 +14,8 @@ export class AutenticacaoController {
   }
 
   @Get('session')
-  async criaSession(
-    @Req() req: RequisicaoComUsuario,
-    @Headers('Authorization') acessToken: string,
-  ) {
-    const token = acessToken.split(' ')[1];
-    return (
-      this.autenticacaoService.validateAccessToken(token),
-      this.autenticacaoService.decodeToken(token)
-    );
+  @UseGuards(AutenticacaoGuard)
+  getSession(@Req() req: RequisicaoComUsuario) {
+    return req.usuario;
   }
 }
